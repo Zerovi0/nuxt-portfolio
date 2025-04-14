@@ -1,3 +1,11 @@
+# Tools used
+- @nuxtjs/color-mode
+- @nuxtjs/tailwindcss
+- @nuxtjs/icon
+- @nuxt/image
+- shadcn-nuxt
+- pnpm
+
 # Project Structure
 
 This document outlines the folder structure of the Nuxt.js portfolio project, including the purpose of each directory and file.

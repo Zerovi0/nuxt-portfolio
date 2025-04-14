@@ -1,0 +1,19 @@
+1. My build system is pnpm
+2. My package manager is pnpm
+3. My framework is Nuxt.js
+4. I use shadcn-nuxt for UI components
+5. I use tailwindcss for styling
+6. I use @nuxtjs/color-mode for dark mode
+7. I use @nuxt/icons for icons
+8. I use @nuxt/image for image optimization
+9. I use @nuxt/fonts for font optimization
+10. I use @nuxtjs/eslint for linting
+11. I use the v4 compatibility setting for the NEW nuxtjs directory strucure
+12. I use the new nuxtjs directory structure
+13. Always read the current file thoroughly before making changes
+14. Always follow existing code patterns
+15. Always follow eslint rules
+16. Follow a minimal code approach
+17. Avoid overengineering
+18. Write modular code
+19. Always avoid code duplication
