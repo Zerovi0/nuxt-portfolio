@@ -7,102 +7,98 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
  * @param typeSpeed The delay in milliseconds between typing each character.
  * @param initialDelay The delay in milliseconds before typing starts.
  * @param cursorBlinkSpeed The speed in milliseconds for the cursor blink.
- * @returns A computed ref containing the currently displayed text with cursor effect.
+ * @returns An object with displayedText and typingComplete status.
  */
 export function useTypingAnimation(
   textToType: string,
-  typeSpeed: number = 50,
-  initialDelay: number = 1000, // Delay before typing starts
+  typeSpeed: number = 500,
+  initialDelay: number = 1000,
   cursorBlinkSpeed: number = 500
 ) {
   const typedText = ref('')
   const showCursor = ref(false)
-  const isTyping = ref(false)
   const typingComplete = ref(false)
-
+  
   let currentIndex = 0
-  let typingIntervalId: ReturnType<typeof setInterval> | null = null
-  let cursorIntervalId: ReturnType<typeof setInterval> | null = null
-  let initialTimeoutId: ReturnType<typeof setTimeout> | null = null
+  let timers = {
+    typing: null as ReturnType<typeof setInterval> | null,
+    cursor: null as ReturnType<typeof setInterval> | null,
+    initial: null as ReturnType<typeof setTimeout> | null
+  }
+
+  // Process text elements efficiently (HTML tags and entities)
+  const processTextElement = () => {
+    if (currentIndex >= textToType.length) {
+      finishTyping()
+      return
+    }
+    
+    // Handle special HTML elements
+    if (textToType[currentIndex] === '<' || textToType[currentIndex] === '&') {
+      const isTag = textToType[currentIndex] === '<'
+      const endChar = isTag ? '>' : ';'
+      const endIndex = textToType.indexOf(endChar, currentIndex)
+      const maxLength = isTag ? 50 : 10 // Reasonable limits for tags and entities
+      
+      if (endIndex !== -1 && endIndex - currentIndex < maxLength) {
+        // Append entire tag or entity at once
+        typedText.value += textToType.substring(currentIndex, endIndex + 1)
+        currentIndex = endIndex + 1
+      } else {
+        // Malformed tag/entity - type character literally
+        typedText.value += textToType[currentIndex]
+        currentIndex++
+      }
+    } else {
+      // Regular character
+      typedText.value += textToType[currentIndex]
+      currentIndex++
+    }
+  }
+
+  const finishTyping = () => {
+    clearAllTimers()
+    typingComplete.value = true
+    showCursor.value = false
+  }
+
+  const clearAllTimers = () => {
+    Object.values(timers).forEach(timer => {
+      if (timer) {
+        typeof timer === 'number' ? clearTimeout(timer) : clearInterval(timer)
+      }
+    })
+  }
 
   const startTyping = () => {
-    isTyping.value = true
-    typingComplete.value = false
-    typedText.value = '' // Reset text
+    typedText.value = ''
     currentIndex = 0
-
-    // Clear initial cursor blink if it's still running
-    if (cursorIntervalId) clearInterval(cursorIntervalId)
-
-    // Start cursor blinking
-    cursorIntervalId = setInterval(() => {
-      showCursor.value = !showCursor.value
-    }, cursorBlinkSpeed)
-
-    // Start typing characters
-    typingIntervalId = setInterval(() => {
-      if (currentIndex < textToType.length) {
-        // Check if the current character is the start of an HTML tag
-        if (textToType[currentIndex] === '<') {
-          // Find the closing '>' of the tag
-          const tagEndIndex = textToType.indexOf('>', currentIndex);
-          if (tagEndIndex !== -1) {
-            // Append the entire tag at once
-            const tag = textToType.substring(currentIndex, tagEndIndex + 1);
-            typedText.value += tag;
-            currentIndex = tagEndIndex + 1; // Move index past the tag
-          } else {
-            // Malformed tag? Or just '<' character? Type it literally.
-            typedText.value += textToType[currentIndex];
-            currentIndex++;
-          }
-        } else {
-          // It's a regular character, append it
-          typedText.value += textToType[currentIndex];
-          currentIndex++;
-        }
-      } else {
-        // Typing finished
-        if (typingIntervalId) clearInterval(typingIntervalId)
-        if (cursorIntervalId) clearInterval(cursorIntervalId)
-        isTyping.value = false
-        typingComplete.value = true
-        showCursor.value = false // Hide cursor when done
-      }
-    }, typeSpeed)
+    typingComplete.value = false
+    
+    // Log the typeSpeed being used for debugging
+    console.log(`Starting typing animation with typeSpeed: ${typeSpeed}ms`);
+    
+    timers.typing = setInterval(processTextElement, typeSpeed)
   }
 
   onMounted(() => {
-    // Initial cursor blink before typing starts
-    typingComplete.value = false
-    isTyping.value = false
-    showCursor.value = true // Start with cursor visible
-    cursorIntervalId = setInterval(() => {
-        showCursor.value = !showCursor.value
+    // Start cursor blinking
+    timers.cursor = setInterval(() => {
+      showCursor.value = !showCursor.value
     }, cursorBlinkSpeed)
-
-    // Delay starting the actual typing
-    initialTimeoutId = setTimeout(() => {
-        startTyping();
-    }, initialDelay);
-
+    
+    // Delay before typing starts
+    timers.initial = setTimeout(startTyping, initialDelay)
   })
 
-  onUnmounted(() => {
-    // Cleanup timers
-    if (typingIntervalId) clearInterval(typingIntervalId)
-    if (cursorIntervalId) clearInterval(cursorIntervalId)
-    if (initialTimeoutId) clearTimeout(initialTimeoutId)
-  })
+  onUnmounted(clearAllTimers)
 
-  // Computed property to display text + cursor
-  const displayedText = computed(() => {
-    if (typingComplete.value) {
-      return typedText.value // Just the text when done
-    }
-    // Text + cursor (blinking) or just cursor (initially)
-    return `${typedText.value}${showCursor.value ? '_' : ''}`
-  })
+  // Computed property to display text with cursor
+  const displayedText = computed(() => 
+    typingComplete.value 
+      ? typedText.value 
+      : `${typedText.value}${showCursor.value ? '_' : ''}`
+  )
 
-  return { displayedText } // Return the computed ref
+  return { displayedText, typingComplete }
 }
