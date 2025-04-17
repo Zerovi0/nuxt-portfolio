@@ -1,14 +1,14 @@
 <template>
-  <div class="relative min-h-[250px]">
-    <div class="absolute inset-0 flex items-center justify-center">
+  <div class="relative w-full h-full">
+    <div class="w-full h-full flex items-start justify-end pt-8 overflow-hidden">
       <!-- Typing Animation Container -->
       <Transition
         leave-active-class="duration-700 ease-in-out transition-all" 
         leave-from-class="opacity-100 scale-100 transform"
         leave-to-class="opacity-0 scale-50 transform"
       >
-        <div v-if="textVisible" class="w-full flex items-center justify-start max-w-2xl mx-auto overflow-hidden">
-          <div class="text-2xl font-mono text-foreground w-full whitespace-pre-wrap" v-html="formattedDisplayedText"></div>
+        <div v-if="textVisible" class="w-full flex items-start justify-end overflow-hidden px-2">
+          <div class="text-[length:max(24px,min(2vw,64px))] font-mono text-foreground w-full whitespace-pre-wrap" v-html="formattedDisplayedText"></div>
         </div>
       </Transition>
 
@@ -18,7 +18,7 @@
         enter-from-class="opacity-0 scale-50 transform"
         enter-to-class="opacity-100 scale-100 transform"
       >
-        <div v-if="readyForTransform" class="max-w-2xl w-full">
+        <div v-if="readyForTransform" class="w-full mt-12">
           <div class="w-full">
             <h2 class="text-2xl font-bold mb-4 text-primary">About me</h2>
             <p class="mb-3 text-foreground">

@@ -4,13 +4,13 @@
       
       <!-- Menubar with ThemeToggle aligned to the far right -->
       <div class="border-b bg-background">
-        <div class="container flex items-center justify-end h-12 px-4">
+        <div class="w-full flex items-center justify-end h-16 px-4">
           <ThemeToggle />
         </div>
       </div>
       
       <div class="flex-1 bg-background">
-        <main class="container">
+        <main class="w-full px-4">
           <slot />
         </main>
       </div>

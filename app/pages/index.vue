@@ -1,7 +1,10 @@
 <template>
-  <div class="py-8">
-    <h1 class="text-3xl font-bold mb-4 text-foreground">Welcome to My Portfolio</h1>
-    <AnimatedAbout />
+  <div class="py-8 w-full h-full">
+    <div class="w-full flex justify-end">
+      <div class="w-[60%]">
+        <AnimatedAbout />
+      </div>
+    </div>
   </div>
 </template>
 
