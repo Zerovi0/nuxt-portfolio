@@ -1,13 +1,13 @@
 <template>
   <div class="relative w-full h-full">
-    <div class="w-full h-full flex items-start justify-end pt-8 overflow-hidden">
+    <div class="w-full h-full flex items-start justify-center md:justify-end pt-8 overflow-hidden">
       <!-- Typing Animation Container -->
       <Transition
         leave-active-class="duration-700 ease-in-out transition-all" 
         leave-from-class="opacity-100 scale-100 transform"
         leave-to-class="opacity-0 scale-50 transform"
       >
-        <div v-if="textVisible" class="w-full flex items-start justify-end overflow-hidden px-2">
+        <div v-if="textVisible" class="w-full flex items-start justify-center md:justify-end overflow-hidden px-2">
           <div class="text-[length:max(24px,min(2vw,64px))] font-mono text-foreground w-full whitespace-pre-wrap" v-html="formattedDisplayedText"></div>
         </div>
       </Transition>
@@ -18,13 +18,13 @@
         enter-from-class="opacity-0 scale-50 transform"
         enter-to-class="opacity-100 scale-100 transform"
       >
-        <div v-if="readyForTransform" class="w-full mt-12">
+        <div v-if="readyForTransform" class="w-full flex items-start justify-center md:justify-end px-2">
           <div class="w-full">
-            <h2 class="text-2xl font-bold mb-4 text-primary">About me</h2>
-            <p class="mb-3 text-foreground">
+            <h2 class="text-[length:max(24px,min(2vw,64px))] font-bold mb-4 text-primary">About me</h2>
+            <p class="text-[length:max(24px,min(2vw,64px))] mb-3 text-foreground font-mono">
               Some temu-blind-dude with a caffeine addiction.
             </p>
-            <p class="text-foreground">
+            <p class="text-[length:max(24px,min(2vw,64px))] text-foreground font-mono">
               Building my best software one caffeine pill at a time.
             </p>
           </div>
