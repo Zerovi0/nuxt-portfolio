@@ -1,12 +1,5 @@
 <template>
-  <div 
-    class="project-card rounded-lg overflow-hidden shadow-lg transition-all duration-500"
-    :class="{ 
-      'bg-background border border-border': true,
-      'scale-100': isActive, 
-      'scale-95 opacity-70': !isActive 
-    }"
-  >
+  <div :class="cardClasses">
     <!-- Image carousel section -->
     <div class="relative overflow-hidden aspect-video">
       <!-- Project images -->
@@ -16,8 +9,7 @@
           :key="idx"
           :src="image"
           :alt="`${project.title} - Image ${idx + 1}`"
-          class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
-          :class="{ 'opacity-100': idx === currentImageIndex, 'opacity-0': idx !== currentImageIndex }"
+          :class="getImageClasses(idx)"
           placeholder
           format="webp"
         />
@@ -26,7 +18,7 @@
       <!-- Navigation arrows - only shown for active projects with showNavigation enabled -->
       <template v-if="isActive && showNavigation">
         <button 
-          class="absolute left-2 top-1/2 -translate-y-1/2 bg-background/80 text-foreground p-2 rounded-full hover:bg-background/90 transition-colors z-10"
+          :class="navButtonClasses('left')"
           @click.stop="prevImage"
           aria-label="Previous image"
         >
@@ -34,7 +26,7 @@
         </button>
         
         <button 
-          class="absolute right-2 top-1/2 -translate-y-1/2 bg-background/80 text-foreground p-2 rounded-full hover:bg-background/90 transition-colors z-10"
+          :class="navButtonClasses('right')"
           @click.stop="nextImage"
           aria-label="Next image"
         >
@@ -47,8 +39,7 @@
         <button
           v-for="(_, idx) in project.images" 
           :key="idx"
-          class="w-2 h-2 rounded-full transition-all"
-          :class="idx === currentImageIndex ? 'bg-primary' : 'bg-gray-400/70'"
+          :class="getIndicatorClasses(idx)"
           @click.stop="setImage(idx)"
           :aria-label="`Go to image ${idx + 1}`"
         ></button>
@@ -57,21 +48,15 @@
 
     <!-- Project title -->
     <div class="px-4 py-3 text-center">
-      <h3 class="text-lg font-medium truncate">{{ project.title }}</h3>
+      <h3 class="text-lg font-medium truncate">{{ truncatedTitle }}</h3>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-
-// Define project type to ensure type safety
-interface Project {
-  id: number
-  title: string
-  description: string
-  technologies: string[]
-  images: string[]
-}
+import { computed } from 'vue'
+import { cn, truncateText } from '~/utils/ui'
+import { type Project } from '~/composables/useProjects'
 
 // Define props
 const props = defineProps({
@@ -95,6 +80,57 @@ const props = defineProps({
 
 // Define emits for parent component navigation
 const emit = defineEmits(['prev-image', 'next-image'])
+
+// Use cn utility to combine classes for card
+const cardClasses = computed(() => {
+  return cn(
+    'project-card rounded-lg overflow-hidden shadow-lg transition-all duration-500',
+    'bg-background border border-border',
+    {
+      'scale-100': props.isActive,
+      'scale-95 opacity-70': !props.isActive
+    }
+  )
+})
+
+// Get classes for each image based on whether it's the current one
+const getImageClasses = (index: number) => {
+  return cn(
+    'absolute inset-0 w-full h-full object-cover transition-opacity duration-300',
+    {
+      'opacity-100': index === props.currentImageIndex,
+      'opacity-0': index !== props.currentImageIndex
+    }
+  )
+}
+
+// Get classes for navigation buttons
+const navButtonClasses = (position: 'left' | 'right') => {
+  return cn(
+    'absolute top-1/2 -translate-y-1/2 bg-background/80 text-foreground p-2 rounded-full',
+    'hover:bg-background/90 transition-colors z-10',
+    {
+      'left-2': position === 'left',
+      'right-2': position === 'right'
+    }
+  )
+}
+
+// Get classes for indicator dots
+const getIndicatorClasses = (index: number) => {
+  return cn(
+    'w-2 h-2 rounded-full transition-all',
+    {
+      'bg-primary': index === props.currentImageIndex,
+      'bg-gray-400/70': index !== props.currentImageIndex
+    }
+  )
+}
+
+// Truncate title if it's too long
+const truncatedTitle = computed(() => {
+  return truncateText(props.project.title, 30)
+})
 
 // Image navigation methods
 const nextImage = (event?: Event) => {

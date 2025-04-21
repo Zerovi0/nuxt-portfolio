@@ -2,7 +2,7 @@
   <div class="project-carousel-container w-full py-12">
     <!-- Project title heading -->
     <h2 class="text-2xl md:text-3xl font-bold text-center mb-8">
-      {{ activeProject.title }}
+      {{ activeProject?.title || 'Project' }}
     </h2>
 
     <!-- Carousel container with perspective for 3D effect -->
@@ -41,9 +41,9 @@
           }"
         >
           <ProjectCard 
-            :project="activeProject" 
+            :project="getActiveProject()" 
             :isActive="true"
-            :currentImageIndex="currentImageIndices[activeProjectIndex] || 0"
+            :currentImageIndex="getCurrentImageIndex()"
             :showNavigation="true"
             @next-image="nextImage()"
             @prev-image="prevImage()"
@@ -73,186 +73,95 @@
     <div class="project-details mt-10 max-w-3xl mx-auto px-4">
       <div class="description mb-4">
         <h3 class="text-xl font-semibold mb-2">Description:</h3>
-        <p>{{ activeProject.description }}</p>
+        <p>{{ activeProject?.description || 'No description available' }}</p>
       </div>
       <div class="technologies">
         <h3 class="text-xl font-semibold mb-2">Technologies:</h3>
-        <p>{{ activeProject.technologies.join(', ') }}</p>
+        <p>{{ activeProject?.technologies?.join(', ') || 'None' }}</p>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted, onBeforeUnmount } from 'vue'
 import ProjectCard from './ProjectCard.vue'
+import { useProjects, type Project } from '~/composables/useProjects'
+import { useCarousel, type CarouselOptions } from '~/composables/useCarousel'
 
-// Define project type
-interface Project {
-  id: number
-  title: string
-  description: string
-  technologies: string[]
-  images: string[]
+// Get projects data from the composable
+const { projects } = useProjects()
+
+// Configure carousel options
+const carouselOptions: CarouselOptions = {
+  autoRotationInterval: 5000, // 5 seconds
+  animationDuration: 500 // 500ms
 }
 
-// Sample project data - in a real app this would likely come from an API or CMS
-const projects = ref<Project[]>([
-  {
-    id: 1,
-    title: 'E-Commerce Platform',
-    description: 'A fully responsive e-commerce platform with product filtering, cart functionality, and payment integration.',
-    technologies: ['Vue.js', 'Nuxt', 'Tailwind CSS', 'Stripe API'],
-    images: ['/images/projects/ecom-1.webp', '/images/projects/ecom-2.webp', '/images/projects/ecom-3.webp']
-  },
-  {
-    id: 2,
-    title: 'Task Management App',
-    description: 'A collaborative task management application with real-time updates, task assignment, and progress tracking.',
-    technologies: ['Nuxt.js', 'TypeScript', 'Pinia', 'Firebase'],
-    images: ['/images/projects/ecom-1.webp', '/images/projects/ecom-2.webp', '/images/projects/ecom-3.webp']
-  },
-  {
-    id: 3,
-    title: 'Portfolio Website',
-    description: 'A minimalist portfolio website showcasing projects and skills with smooth animations and responsive design.',
-    technologies: ['Nuxt.js', 'GSAP', 'Tailwind CSS'],
-    images: ['/images/projects/ecom-1.webp', '/images/projects/ecom-2.webp', '/images/projects/ecom-3.webp']
-  }
-])
+// Use the carousel composable with our projects
+const {
+  activeIndex: activeProjectIndex,
+  activeItem: activeProject,
+  previousItem,
+  nextItem,
+  currentItemIndices,
+  isAnimating,
+  rotationDirection,
+  previous,
+  next,
+  nextSubItem,
+  prevSubItem
+} = useCarousel<Project>(projects.value, carouselOptions)
 
-// State tracking
-const activeProjectIndex = ref(1) // Start with the middle project selected
-const currentImageIndices = reactive<number[]>(projects.value.map(() => 0)) // Track current image for each project
-const autoRotationInterval = ref<ReturnType<typeof setInterval> | null>(null) // For auto-rotation of images
-const isAnimating = ref(false) // Track if the carousel is currently animating
-
-// Track rotation direction for animation
-const rotationDirection = ref<'next' | 'prev' | null>(null);
-
-// Active project computed property to avoid undefined errors
-const activeProject = computed(() => {
-  return projects.value[activeProjectIndex.value] || {
-    id: 0,
-    title: '',
-    description: '',
-    technologies: [],
-    images: []
-  }
-})
-
-// Rotate to next or previous project with animation
-const rotateToProject = (direction: 'next' | 'prev') => {
-  if (isAnimating.value) return; // Prevent multiple clicks during animation
-  
-  isAnimating.value = true;
-  rotationDirection.value = direction;
-  
-  // Set a timeout to update the active project after animation completes
-  setTimeout(() => {
-    // Update active project index based on direction
-    if (direction === 'next') {
-      activeProjectIndex.value = (activeProjectIndex.value + 1) % projects.value.length;
-    } else {
-      activeProjectIndex.value = activeProjectIndex.value === 0 ? 
-        projects.value.length - 1 : activeProjectIndex.value - 1;
-    }
-    
-    // Reset animation flag and direction
-    isAnimating.value = false;
-    rotationDirection.value = null;
-    
-    // Reset auto-rotation of images
-    startAutoImageRotation();
-  }, 500); // Time should match transition duration in CSS (500ms)
-}
-
-// Navigate to previous project - wrapper for rotateToProject
-const previousProject = () => {
-  rotateToProject('prev');
-}
-
-// Navigate to next project - wrapper for rotateToProject
-const nextProject = () => {
-  rotateToProject('next');
+// Default empty project to avoid null issues
+const emptyProject: Project = {
+  id: 0,
+  title: '',
+  description: '',
+  technologies: [],
+  images: []
 }
 
 // Get previous project to display on the left
 const getPreviousProject = (): Project => {
-  if (projects.value.length <= 1) return activeProject.value;
-  
-  const prevIndex = activeProjectIndex.value === 0 ? 
-    projects.value.length - 1 : activeProjectIndex.value - 1;
-  return projects.value[prevIndex] || activeProject.value;
+  return previousItem.value as Project || emptyProject
 }
 
 // Get next project to display on the right
 const getNextProject = (): Project => {
-  if (projects.value.length <= 1) return activeProject.value;
-  
-  const nextIndex = (activeProjectIndex.value + 1) % projects.value.length;
-  return projects.value[nextIndex] || activeProject.value;
+  return nextItem.value as Project || emptyProject
+}
+
+// Wrapper for carousel rotation
+const rotateToProject = (direction: 'next' | 'prev') => {
+  if (direction === 'next') {
+    next()
+  } else {
+    previous()
+  }
+}
+
+// Get active project with null safety
+const getActiveProject = (): Project => {
+  return activeProject.value as Project || emptyProject
+}
+
+// Get current image index with null safety
+const getCurrentImageIndex = (): number => {
+  return currentItemIndices[activeProjectIndex.value] || 0
 }
 
 // Image carousel navigation for active project
 const nextImage = () => {
-  const index = activeProjectIndex.value
-  if (index >= 0 && index < projects.value.length) {
-    const project = projects.value[index]
-    if (project && project.images && project.images.length > 0) {
-      // Ensure the index exists in our current image indices array
-      if (currentImageIndices[index] === undefined) {
-        currentImageIndices[index] = 0
-      }
-      
-      // Update to next image
-      currentImageIndices[index] = 
-        (currentImageIndices[index] + 1) % project.images.length
-    }
+  if (activeProject.value && activeProject.value.images) {
+    nextSubItem(activeProjectIndex.value, activeProject.value.images.length)
   }
 }
 
 const prevImage = () => {
-  const index = activeProjectIndex.value
-  if (index >= 0 && index < projects.value.length) {
-    const project = projects.value[index]
-    if (project && project.images && project.images.length > 0) {
-      // Ensure the index exists in our current image indices array
-      if (currentImageIndices[index] === undefined) {
-        currentImageIndices[index] = 0
-      }
-      
-      // Update to previous image
-      currentImageIndices[index] = 
-        (currentImageIndices[index] - 1 + project.images.length) % project.images.length
-    }
+  if (activeProject.value && activeProject.value.images) {
+    prevSubItem(activeProjectIndex.value, activeProject.value.images.length)
   }
 }
-
-// Auto-rotation of images for active project
-const startAutoImageRotation = () => {
-  // Clear any existing interval
-  if (autoRotationInterval.value) {
-    clearInterval(autoRotationInterval.value)
-  }
-  
-  // Set up new interval
-  autoRotationInterval.value = setInterval(() => {
-    nextImage()
-  }, 5000) // 5 seconds interval
-}
-
-// Lifecycle hooks
-onMounted(() => {
-  startAutoImageRotation()
-})
-
-onBeforeUnmount(() => {
-  // Clean up interval when component is destroyed
-  if (autoRotationInterval.value) {
-    clearInterval(autoRotationInterval.value)
-  }
-})
 </script>
 
 <style scoped>
