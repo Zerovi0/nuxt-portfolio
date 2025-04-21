@@ -1,7 +1,18 @@
 <template>
   <Card :class="[cardClasses, 'p-0 overflow-hidden flex flex-col']">
     <!-- Image carousel section -->
-    <div class="relative overflow-hidden aspect-video flex-shrink-0">
+    <div class="relative overflow-hidden aspect-video flex-shrink-0 bg-[oklch(0.40_0.0839_213.14)]">
+      <!-- Background container for images -->
+      <div class="absolute inset-0 w-full h-full backdrop-blur-sm overflow-hidden">
+        <NuxtImg
+          v-if="project.images.length > 0"
+          :src="project.images[props.currentImageIndex]"
+          :alt="`${project.title} - Background`"
+          class="absolute inset-0 w-full h-full object-cover opacity-50 scale-110 blur-sm"
+          placeholder
+          format="webp"
+        />
+      </div>
       <!-- Project images -->
       <div class="relative w-full h-full">
         <NuxtImg
@@ -95,7 +106,7 @@ const cardClasses = computed(() => {
 // Get classes for each image based on whether it's the current one
 const getImageClasses = (index: number) => {
   return cn(
-    'absolute inset-0 w-full h-full object-cover transition-opacity duration-300',
+    'absolute inset-0 w-full h-full object-contain object-center transition-opacity duration-300',
     {
       'opacity-100': index === props.currentImageIndex,
       'opacity-0': index !== props.currentImageIndex
