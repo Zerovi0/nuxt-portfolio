@@ -5,28 +5,65 @@
       {{ activeProject.title }}
     </h2>
 
-    <!-- Carousel container with 3D perspective -->
-    <div class="relative perspective-container w-full overflow-hidden" style="perspective: 1000px;">
+    <!-- Carousel container with perspective for 3D effect -->
+    <div class="carousel-container relative w-full max-w-5xl mx-auto overflow-hidden perspective">
+      <!-- Project cards row with 3D transition effect -->
       <div 
-        class="carousel-track flex items-center justify-center transition-transform duration-700"
-        :style="{ transform: `translateZ(-200px) rotateY(${rotationDegree}deg)` }"
+        class="carousel-track flex justify-center items-center gap-4 duration-500 ease-in-out transition-all transform-style-3d"
+        :class="{ 
+          'rotate-carousel-prev': rotationDirection === 'prev' && isAnimating,
+          'rotate-carousel-next': rotationDirection === 'next' && isAnimating
+        }"
       >
-        <!-- Project cards -->
+        <!-- Previous project (left) -->
         <div 
-          v-for="(project, index) in projects" 
-          :key="project.id"
-          class="project-item absolute transition-all duration-700 w-full md:w-3/4 lg:w-2/3 max-w-3xl"
-          :class="{ 'active': index === activeProjectIndex }"
-          :style="getProjectStyle(index)"
-          @click="handleProjectClick(index)"
+          class="project-item flex-shrink-0 w-1/4 opacity-70 cursor-pointer duration-500 ease-in-out transition-all transform-style-3d"
+          :class="{
+            'rotate-item-to-center': rotationDirection === 'prev' && isAnimating,
+            'rotate-item-to-right': rotationDirection === 'next' && isAnimating
+          }"
+          @click="rotateToProject('prev')"
         >
-          <!-- ProjectCard component -->
           <ProjectCard 
-            :project="project" 
-            :isActive="index === activeProjectIndex"
-            :currentImageIndex="currentImageIndices[index] || 0"
-            @next-image="index === activeProjectIndex && nextImage()"
-            @prev-image="index === activeProjectIndex && prevImage()"
+            :project="getPreviousProject()" 
+            :isActive="false"
+            :currentImageIndex="0"
+            :showNavigation="false"
+          />
+        </div>
+        
+        <!-- Active project (center) -->
+        <div 
+          class="project-item active flex-shrink-0 w-1/2 z-10 duration-500 ease-in-out transition-all transform-style-3d"
+          :class="{
+            'rotate-item-to-right': rotationDirection === 'prev' && isAnimating,
+            'rotate-item-to-left': rotationDirection === 'next' && isAnimating
+          }"
+        >
+          <ProjectCard 
+            :project="activeProject" 
+            :isActive="true"
+            :currentImageIndex="currentImageIndices[activeProjectIndex] || 0"
+            :showNavigation="true"
+            @next-image="nextImage()"
+            @prev-image="prevImage()"
+          />
+        </div>
+        
+        <!-- Next project (right) -->
+        <div 
+          class="project-item flex-shrink-0 w-1/4 opacity-70 cursor-pointer duration-500 ease-in-out transition-all transform-style-3d"
+          :class="{
+            'rotate-item-to-left': rotationDirection === 'prev' && isAnimating,
+            'rotate-item-to-center': rotationDirection === 'next' && isAnimating
+          }"
+          @click="rotateToProject('next')"
+        >
+          <ProjectCard 
+            :project="getNextProject()" 
+            :isActive="false"
+            :currentImageIndex="0"
+            :showNavigation="false"
           />
         </div>
       </div>
@@ -47,6 +84,9 @@
 </template>
 
 <script setup lang="ts">
+import { ref, reactive, computed, onMounted, onBeforeUnmount } from 'vue'
+import ProjectCard from './ProjectCard.vue'
+
 // Define project type
 interface Project {
   id: number
@@ -84,8 +124,11 @@ const projects = ref<Project[]>([
 // State tracking
 const activeProjectIndex = ref(1) // Start with the middle project selected
 const currentImageIndices = reactive<number[]>(projects.value.map(() => 0)) // Track current image for each project
-const rotationDegree = ref(0) // Current rotation of carousel
 const autoRotationInterval = ref<ReturnType<typeof setInterval> | null>(null) // For auto-rotation of images
+const isAnimating = ref(false) // Track if the carousel is currently animating
+
+// Track rotation direction for animation
+const rotationDirection = ref<'next' | 'prev' | null>(null);
 
 // Active project computed property to avoid undefined errors
 const activeProject = computed(() => {
@@ -98,58 +141,57 @@ const activeProject = computed(() => {
   }
 })
 
-// Calculated positions for 3D effect
-const getProjectStyle = (index: number) => {
-  // Calculate the position relative to the active project
-  const relativePosition = index - activeProjectIndex.value
+// Rotate to next or previous project with animation
+const rotateToProject = (direction: 'next' | 'prev') => {
+  if (isAnimating.value) return; // Prevent multiple clicks during animation
   
-  // Different transformations based on position
-  if (relativePosition === 0) {
-    // Active project
-    return {
-      transform: `rotateY(0deg) translateZ(200px)`,
-      zIndex: '10',
-      opacity: '1',
+  isAnimating.value = true;
+  rotationDirection.value = direction;
+  
+  // Set a timeout to update the active project after animation completes
+  setTimeout(() => {
+    // Update active project index based on direction
+    if (direction === 'next') {
+      activeProjectIndex.value = (activeProjectIndex.value + 1) % projects.value.length;
+    } else {
+      activeProjectIndex.value = activeProjectIndex.value === 0 ? 
+        projects.value.length - 1 : activeProjectIndex.value - 1;
     }
-  } else if (relativePosition === -1 || (relativePosition === projects.value.length - 1 && activeProjectIndex.value === 0)) {
-    // Left project
-    return {
-      transform: `rotateY(40deg) translateZ(100px) translateX(-300px)`,
-      zIndex: '5',
-      opacity: '0.7',
-    }
-  } else if (relativePosition === 1 || (relativePosition === -(projects.value.length - 1) && activeProjectIndex.value === projects.value.length - 1)) {
-    // Right project
-    return {
-      transform: `rotateY(-40deg) translateZ(100px) translateX(300px)`,
-      zIndex: '5',
-      opacity: '0.7',
-    }
-  } else {
-    // Hidden projects
-    return {
-      transform: `rotateY(${relativePosition < 0 ? 90 : -90}deg) translateZ(-300px)`,
-      zIndex: '0',
-      opacity: '0',
-    }
-  }
+    
+    // Reset animation flag and direction
+    isAnimating.value = false;
+    rotationDirection.value = null;
+    
+    // Reset auto-rotation of images
+    startAutoImageRotation();
+  }, 500); // Time should match transition duration in CSS (500ms)
 }
 
-// Handle project selection
-const handleProjectClick = (index: number) => {
-  // Only process click if not on active project
-  if (index !== activeProjectIndex.value) {
-    // Calculate rotation based on position difference
-    const positionDifference = index - activeProjectIndex.value
-    const newRotation = rotationDegree.value - (positionDifference * 120) // 120 degrees per position
-    
-    // Update state
-    rotationDegree.value = newRotation
-    activeProjectIndex.value = index
-    
-    // Reset the auto-rotation for the newly selected project
-    startAutoImageRotation()
-  }
+// Navigate to previous project - wrapper for rotateToProject
+const previousProject = () => {
+  rotateToProject('prev');
+}
+
+// Navigate to next project - wrapper for rotateToProject
+const nextProject = () => {
+  rotateToProject('next');
+}
+
+// Get previous project to display on the left
+const getPreviousProject = (): Project => {
+  if (projects.value.length <= 1) return activeProject.value;
+  
+  const prevIndex = activeProjectIndex.value === 0 ? 
+    projects.value.length - 1 : activeProjectIndex.value - 1;
+  return projects.value[prevIndex] || activeProject.value;
+}
+
+// Get next project to display on the right
+const getNextProject = (): Project => {
+  if (projects.value.length <= 1) return activeProject.value;
+  
+  const nextIndex = (activeProjectIndex.value + 1) % projects.value.length;
+  return projects.value[nextIndex] || activeProject.value;
 }
 
 // Image carousel navigation for active project
@@ -214,28 +256,98 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-.perspective-container {
-  perspective-origin: center;
-  height: 400px; /* Adjust as needed */
+/* Base carousel styles */
+.carousel-container {
+  position: relative;
+}
+
+.perspective {
+  perspective: 1500px;
+}
+
+.transform-style-3d {
+  transform-style: preserve-3d;
 }
 
 .carousel-track {
-  transform-style: preserve-3d;
-  height: 100%;
+  position: relative;
 }
 
+/* Project item styling */
 .project-item {
-  transform-style: preserve-3d;
-  transition: transform 0.7s ease-out, opacity 0.7s ease-out;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  backface-visibility: hidden;
 }
 
-/* Ensure proper stacking */
+/* Active project styling */
 .project-item.active {
-  pointer-events: all;
+  transform: scale(1.05) translateZ(50px);
+  z-index: 10;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
+/* Inactive projects styling */
 .project-item:not(.active) {
-  pointer-events: all; /* Allow clicks to select inactive projects */
+  filter: grayscale(40%);
   cursor: pointer;
+  transform: translateZ(-50px);
+}
+
+/* Rotation animations */
+.rotate-carousel-next {
+  transform: rotateY(-15deg);
+}
+
+.rotate-carousel-prev {
+  transform: rotateY(15deg);
+}
+
+/* Item animations */
+.rotate-item-to-center {
+  transform: rotateY(0deg) translateZ(50px) scale(1.05);
+  z-index: 10;
+  filter: grayscale(0%);
+}
+
+.rotate-item-to-left {
+  transform: rotateY(45deg) translateZ(-50px) translateX(-30%) scale(0.9);
+  z-index: 1;
+  filter: grayscale(40%);
+}
+
+.rotate-item-to-right {
+  transform: rotateY(-45deg) translateZ(-50px) translateX(30%) scale(0.9);
+  z-index: 1;
+  filter: grayscale(40%);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .carousel-track {
+    flex-direction: column;
+    gap: 2rem;
+  }
+  
+  .project-item {
+    width: 90% !important;
+  }
+  
+  /* Disable 3D effects on mobile */
+  .perspective {
+    perspective: none;
+  }
+  
+  .transform-style-3d {
+    transform-style: flat;
+  }
+  
+  .rotate-carousel-next,
+  .rotate-carousel-prev,
+  .rotate-item-to-center,
+  .rotate-item-to-left,
+  .rotate-item-to-right {
+    transform: none;
+  }
 }
 </style>

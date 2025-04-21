@@ -23,8 +23,8 @@
         />
       </div>
 
-      <!-- Navigation arrows - only shown for active project -->
-      <template v-if="isActive">
+      <!-- Navigation arrows - only shown for active projects with showNavigation enabled -->
+      <template v-if="isActive && showNavigation">
         <button 
           class="absolute left-2 top-1/2 -translate-y-1/2 bg-background/80 text-foreground p-2 rounded-full hover:bg-background/90 transition-colors z-10"
           @click.stop="prevImage"
@@ -86,6 +86,10 @@ const props = defineProps({
   currentImageIndex: {
     type: Number,
     default: 0
+  },
+  showNavigation: {
+    type: Boolean,
+    default: true
   }
 })
 
