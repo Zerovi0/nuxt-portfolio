@@ -190,7 +190,7 @@ const prevImage = () => {
 
 /* Active project styling */
 .project-item.active {
-  transform: scale(1.02) translateZ(50px);
+  transform: scale(0.95) translateZ(50px);
   z-index: 10;
 }
 

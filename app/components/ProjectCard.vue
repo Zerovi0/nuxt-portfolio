@@ -1,7 +1,7 @@
 <template>
-  <Card :class="[cardClasses, 'p-0']">
+  <Card :class="[cardClasses, 'p-0 overflow-hidden flex flex-col']">
     <!-- Image carousel section -->
-    <div class="relative overflow-hidden aspect-video">
+    <div class="relative overflow-hidden aspect-video flex-shrink-0">
       <!-- Project images -->
       <div class="relative w-full h-full">
         <NuxtImg
@@ -45,10 +45,9 @@
         ></button>
       </div>
     </div>
-
     <!-- Project title -->
-    <CardFooter class="px-4 py-3 text-center">
-      <CardTitle class="text-lg font-medium truncate">{{ truncatedTitle }}</CardTitle>
+    <CardFooter class="px-4 pt-0 pb-3 text-center mt-0 flex-shrink-0 border-t-0">
+      <CardTitle class="text-sm font-medium truncate">{{ truncatedTitle }}</CardTitle>
     </CardFooter>
   </Card>
 </template>
