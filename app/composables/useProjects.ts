@@ -13,14 +13,16 @@ export function useProjects() {
   const projects = ref<Project[]>([
     {
       id: 1,
-      title: 'E-Commerce Platform',
-      description: 'A fully responsive e-commerce platform with product filtering, cart functionality, and payment integration.',
-      technologies: ['Vue.js', 'Nuxt', 'Tailwind CSS', 'Stripe API'],
+      title: 'Hippotherapy App',
+      description: "A fully responsive flutter app for therapists in the hippotherapy field to track session data and patients.\n\n"+
+      "Initially it was a struggle using and modifying components on the marketplace to speed up development,"+
+      "but it was valuable in learning to work with other people's code",
+      technologies: ['Flutter', 'Dart', 'ASP.NET Core', 'Firebase'],
       images: ['/images/projects/hippo-1.png', '/images/projects/hippo-2.png', '/images/projects/hippo-3.png', '/images/projects/hippo-4.png']
     },
     {
       id: 2,
-      title: 'Task Management App',
+      title: 'Flyer Identification System',
       description: 'A collaborative task management application with real-time updates, task assignment, and progress tracking.',
       technologies: ['Nuxt.js', 'TypeScript', 'Pinia', 'Firebase'],
       images: ['/images/projects/hippo-1.png', '/images/projects/hippo-2.png', '/images/projects/hippo-3.png', '/images/projects/hippo-4.png']

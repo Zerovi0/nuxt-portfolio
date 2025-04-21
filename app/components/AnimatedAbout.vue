@@ -12,7 +12,7 @@
         leave-to-class="opacity-0 scale-50 transform"
       >
         <div v-if="showCodeView" class="w-full h-full flex justify-center items-center">
-          <Card class="w-full h-[90%]" style="box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.2);">
+          <Card class="w-[90%] h-[90%] card-shadow">
             <CardContent class="pt-6 h-full flex items-center">
               <div class="text-[length:max(20px,min(1.5vw,28px))] font-mono text-white whitespace-pre-wrap" v-html="formattedDisplayedText"></div>
             </CardContent>
@@ -59,12 +59,12 @@ import { formatIndentedText } from '@/utils/textFormatting'
 import { Card, CardContent, CardHeader, CardTitle } from '#components'
 
 // Content to be typed
-const fullText = `<span class="text-blue-500">&lt;Noah&gt;</span>
-  <span class="text-purple-500">&lt;About me&gt;</span>
+const fullText = `<span class="text-orange-500">&lt;Noah&gt;</span>
+  <span class="text-blue-500">&lt;About me&gt;</span>
     Some temu-blind-dude with a caffeine addiction.
     Building my best software one caffeine pill at a time.
-  <span class="text-purple-500">&lt;/About me&gt;</span>
-<span class="text-blue-500">&lt;/Noah&gt;</span>
+  <span class="text-blue-500">&lt;/About me&gt;</span>
+<span class="text-orange-500">&lt;/Noah&gt;</span>
 `;
 
 // Animation and view state variables

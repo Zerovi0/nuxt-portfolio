@@ -1,7 +1,7 @@
 <template>
   <div class="py-8 w-full h-full flex flex-col gap-16">
     <!-- About section -->
-    <div class="w-full flex justify-center md:justify-center bg-[oklch(0.48_0.0839_213.14)] h-[60vh]">
+    <div class="w-full flex justify-center md:justify-center bg-[oklch(0.48_0.0839_213.14)] h-[30vh]">
       <div class="w-full md:w-[60%]">
         <AnimatedAbout />
       </div>
