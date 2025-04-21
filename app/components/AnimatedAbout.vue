@@ -20,7 +20,7 @@
       >
         <div v-if="readyForTransform" class="w-full flex items-start justify-center md:justify-end px-2">
           <div class="w-full">
-            <h2 class="text-[length:max(24px,min(2vw,64px))] font-bold mb-4 text-primary">About me</h2>
+            <h2 class="text-[length:max(24px,min(2vw,64px))] font-bold mb-4 py-2 px-4 bg-label-bg text-label-fg inline-block rounded-lg">About me</h2>
             <p class="text-[length:max(24px,min(2vw,64px))] mb-3 text-foreground font-mono">
               Some temu-blind-dude with a caffeine addiction.
             </p>
@@ -35,9 +35,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { useTypingAnimation } from '~/composables/useTypingAnimation'
-import { formatIndentedText } from '~/utils/textFormatting'
+import { formatIndentedText } from '@/utils/textFormatting'
 
 // Content to be typed
 const fullText = `<span class="text-blue-500">&lt;Noah&gt;</span>
@@ -52,13 +50,13 @@ const fullText = `<span class="text-blue-500">&lt;Noah&gt;</span>
 const textVisible = ref(true)
 const readyForTransform = ref(false)
 
-// Initialize typing animation with proper parameters
+// Initialize typing animation
 const { displayedText, typingComplete } = useTypingAnimation(fullText, 25, 1000, 500)
 
-// Use the textFormatting utility to format the displayed text
-const formattedDisplayedText = computed(() => {
-  return formatIndentedText(displayedText.value, typingComplete.value)
-})
+// Use the utility function to format the displayed text
+const formattedDisplayedText = computed(() => 
+  formatIndentedText(displayedText.value, typingComplete.value)
+)
 
 // Handle animation sequence when typing completes
 watch(typingComplete, (isComplete) => {
