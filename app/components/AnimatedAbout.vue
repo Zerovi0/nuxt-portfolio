@@ -12,9 +12,9 @@
         leave-to-class="opacity-0 scale-50 transform"
       >
         <div v-if="showCodeView" class="w-full h-full flex justify-center items-center">
-          <Card class="w-[90%] h-[90%] card-shadow">
-            <CardContent class="pt-6 h-full flex items-center">
-              <div class="text-[length:max(20px,min(1.5vw,28px))] font-mono text-white whitespace-pre-wrap" v-html="formattedDisplayedText"></div>
+          <Card class="w-[95%] max-h-[95%] h-auto card-shadow">
+            <CardContent class="pt-6 h-full flex items-center overflow-auto">
+              <div class="text-[length:max(18px,min(1.5vw,28px))] font-mono text-white whitespace-pre-wrap overflow-auto" v-html="formattedDisplayedText"></div>
             </CardContent>
           </Card>
         </div>
@@ -25,25 +25,26 @@
         <div class="flip-card" :class="[`flip-${currentFlipDirection}`, { 'flipped': showCardView }]">
           <!-- Front side (Code View) -->
           <div class="flip-card-front w-full h-full flex justify-center items-center">
-            <Card class="w-[90%] h-[90%] card-shadow">
-              <CardContent class="pt-6 h-full flex items-center">
-                <div class="text-[length:max(20px,min(1.5vw,28px))] font-mono text-white whitespace-pre-wrap" v-html="formattedDisplayedText"></div>
+            <Card class="w-[95%] max-h-[95%] h-auto card-shadow">
+              <CardContent class="pt-6 h-full flex items-center overflow-auto">
+                <div class="text-[length:max(18px,min(1.5vw,28px))] font-mono text-white whitespace-pre-wrap overflow-auto" v-html="formattedDisplayedText"></div>
               </CardContent>
             </Card>
           </div>
           
           <!-- Back side (About Me Card) -->
           <div class="flip-card-back w-full h-full flex justify-center items-center">
-            <Card class="w-[90%] h-[90%] card-shadow">
+            <Card class="w-[95%] max-h-[95%] h-auto card-shadow">
               <CardHeader class="text-center">
-                <CardTitle class="text-[length:max(24px,min(2vw,42px))] font-bold text-white">About me</CardTitle>
+                <CardTitle class="text-[length:max(24px,min(2vw,28px))] font-bold text-white">About me</CardTitle>
               </CardHeader>
-              <CardContent class="text-center h-full flex flex-col justify-center">
-                <p class="text-[length:max(20px,min(1.5vw,28px))] mb-3 text-white font-mono">
-                  Some temu-blind-dude with a caffeine addiction.
+              <CardContent class="text-center h-full flex flex-col justify-center overflow-auto px-4">
+                <p class="text-[length:max(20px,min(1vw,24px))] mb-3 text-white font-mono">
+                  Currently a student at Saskatchewan Polytechnic in the Computer Systems Technology program.
+                  I enjoy learning new technologies and working with unique ideas. I have a passion for software development and I'm looking to branch into game development aswell.
                 </p>
-                <p class="text-[length:max(20px,min(1.5vw,28px))] text-white font-mono">
-                  Building my best software one caffeine pill at a time.
+                <p class="text-[length:max(20px,min(1vw,24px))] text-white font-mono">
+                  Whether it be your website, platform expansion, or a new idea you want brought to life, I'm here to make it happen!
                 </p>
               </CardContent>
             </Card>

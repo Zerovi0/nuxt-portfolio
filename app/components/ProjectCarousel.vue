@@ -1,9 +1,9 @@
 <template>
   <div class="project-carousel-container w-full py-12">
     <!-- Project title heading -->
-    <h2 class="text-2xl md:text-3xl font-bold text-center mb-8">
+    <h3 class="text-1xl md:text-2xl font-bold text-center mb-8">
       {{ activeProject?.title || 'Project' }}
-    </h2>
+    </h3>
 
     <!-- Carousel container with perspective for 3D effect -->
     <div class="carousel-container relative w-full max-w-5xl mx-auto overflow-hidden perspective">
@@ -72,11 +72,11 @@
     <!-- Project description section -->
     <div class="project-details mt-10 max-w-3xl mx-auto px-4">
       <div class="description mb-4">
-        <h3 class="text-xl font-semibold mb-2">Description:</h3>
+        <h3 class="text-xl font-semibold mb-2 text-[oklch(0.68_0.1378_213.14)]">Description:</h3>
         <p>{{ activeProject?.description || 'No description available' }}</p>
       </div>
       <div class="technologies">
-        <h3 class="text-xl font-semibold mb-2">Technologies:</h3>
+        <h3 class="text-xl font-semibold mb-2 text-[oklch(0.68_0.1378_213.14)]">Technologies:</h3>
         <p>{{ activeProject?.technologies?.join(', ') || 'None' }}</p>
       </div>
     </div>

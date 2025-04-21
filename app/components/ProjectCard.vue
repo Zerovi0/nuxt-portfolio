@@ -1,7 +1,7 @@
 <template>
   <Card :class="[cardClasses, 'p-0 overflow-hidden flex flex-col']">
     <!-- Image carousel section -->
-    <div class="relative overflow-hidden aspect-video flex-shrink-0 bg-[oklch(0.40_0.0839_213.14)]">
+    <div class="relative overflow-hidden aspect-video flex-shrink-0 bg-[oklch(0.68_0.1378_213.14)]">
       <!-- Background container for images -->
       <div class="absolute inset-0 w-full h-full backdrop-blur-sm overflow-hidden">
         <NuxtImg

@@ -1,15 +1,15 @@
 <template>
   <div class="py-8 w-full h-full flex flex-col gap-16">
     <!-- About section -->
-    <div class="w-full flex justify-center md:justify-center bg-[oklch(0.48_0.0839_213.14)] h-[30vh]">
-      <div class="w-full md:w-[60%]">
+    <div class="w-full flex justify-center md:justify-center bg-[oklch(0.68_0.1378_213.14)] min-h-[550px] sm:min-h-[500px] lg:min-h-[400px] xl:min-h-[500px]">
+      <div class="w-full md:w-[70%]">
         <AnimatedAbout />
       </div>
     </div>
     
     <!-- Projects carousel section -->
     <section class="projects-section">
-      <h2 class="text-3xl font-bold text-center mb-8">My Projects</h2>
+      <h1 class="text-3xl font-bold text-center mb-0 text-[oklch(0.68_0.1378_213.14)]">My Projects</h1>
       <ProjectCarousel />
     </section>
   </div>
