@@ -45,8 +45,8 @@
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.129 0.042 264.695);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
+  --card: oklch(0.48 0.0839 213.14);
+  --card-foreground: white;
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.129 0.042 264.695);
   --primary: oklch(0.208 0.042 265.755);
@@ -81,8 +81,8 @@
 .dark {
   --background: oklch(0.18 0.0839 299.96);
   --foreground: oklch(0.984 0.003 247.858);
-  --card: oklch(0.129 0.042 264.695);
-  --card-foreground: oklch(0.984 0.003 247.858);
+  --card: oklch(0.48 0.0839 213.14);
+  --card-foreground: white;
   --popover: oklch(0.129 0.042 264.695);
   --popover-foreground: oklch(0.984 0.003 247.858);
   --primary: oklch(0.984 0.003 247.858);
@@ -119,5 +119,12 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  /* Add shadow to all shadcn card components */
+  [data-slot="card"] {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   }
 }

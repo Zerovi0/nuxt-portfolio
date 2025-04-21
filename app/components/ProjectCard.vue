@@ -1,5 +1,5 @@
 <template>
-  <div :class="cardClasses">
+  <Card :class="[cardClasses, 'p-0']">
     <!-- Image carousel section -->
     <div class="relative overflow-hidden aspect-video">
       <!-- Project images -->
@@ -47,16 +47,17 @@
     </div>
 
     <!-- Project title -->
-    <div class="px-4 py-3 text-center">
-      <h3 class="text-lg font-medium truncate">{{ truncatedTitle }}</h3>
-    </div>
-  </div>
+    <CardFooter class="px-4 py-3 text-center">
+      <CardTitle class="text-lg font-medium truncate">{{ truncatedTitle }}</CardTitle>
+    </CardFooter>
+  </Card>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
 import { cn, truncateText } from '~/utils/ui'
 import { type Project } from '~/composables/useProjects'
+import { Card, CardTitle, CardFooter } from '#components'
 
 // Define props
 const props = defineProps({
@@ -84,8 +85,7 @@ const emit = defineEmits(['prev-image', 'next-image'])
 // Use cn utility to combine classes for card
 const cardClasses = computed(() => {
   return cn(
-    'project-card rounded-lg overflow-hidden shadow-lg transition-all duration-500',
-    'bg-background border border-border',
+    'project-card overflow-hidden transition-all duration-500',
     {
       'scale-100': props.isActive,
       'scale-95 opacity-70': !props.isActive
