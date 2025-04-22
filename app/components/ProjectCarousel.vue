@@ -16,55 +16,71 @@
         }"
       >
         <!-- Previous project (left) -->
-        <div 
-          class="project-item flex-shrink-0 w-1/4 opacity-70 cursor-pointer duration-500 ease-in-out transition-all transform-style-3d"
-          :class="{
-            'rotate-item-to-center': rotationDirection === 'prev' && isAnimating,
-            'rotate-item-to-right': rotationDirection === 'next' && isAnimating
-          }"
-          @click="rotateToProject('prev')"
-        >
-          <ProjectCard 
-            :project="getPreviousProject()" 
-            :isActive="false"
-            :currentImageIndex="0"
-            :showNavigation="false"
-          />
+        <div class="project-item-container relative flex-shrink-0 w-1/4 sm:w-1/3">
+          <div 
+            class="project-item w-full opacity-70 duration-500 ease-in-out transition-all transform-style-3d"
+            :class="{
+              'rotate-item-to-center': rotationDirection === 'prev' && isAnimating,
+              'rotate-item-to-right': rotationDirection === 'next' && isAnimating
+            }"
+          >
+            <ProjectCard 
+              :project="getPreviousProject()" 
+              :isActive="false"
+              :currentImageIndex="0"
+              :showNavigation="false"
+            />
+          </div>
+          <!-- Clickable overlay for Firefox compatibility -->
+          <button 
+            class="absolute inset-0 z-30 opacity-0 cursor-pointer hover:cursor-pointer focus:outline-none"
+            @click="rotateToProject('prev')"
+            aria-label="Previous project"
+          ></button>
         </div>
         
         <!-- Active project (center) -->
-        <div 
-          class="project-item active flex-shrink-0 w-1/2 z-10 duration-500 ease-in-out transition-all transform-style-3d"
-          :class="{
-            'rotate-item-to-right': rotationDirection === 'prev' && isAnimating,
-            'rotate-item-to-left': rotationDirection === 'next' && isAnimating
-          }"
-        >
-          <ProjectCard 
-            :project="getActiveProject()" 
-            :isActive="true"
-            :currentImageIndex="getCurrentImageIndex()"
-            :showNavigation="true"
-            @next-image="nextImage()"
-            @prev-image="prevImage()"
-          />
+        <div class="project-item-container relative flex-shrink-0 w-1/2 sm:w-1/3 z-10">
+          <div 
+            class="project-item w-full duration-500 ease-in-out transition-all transform-style-3d active-item"
+            :class="{
+              'rotate-item-to-right': rotationDirection === 'prev' && isAnimating,
+              'rotate-item-to-left': rotationDirection === 'next' && isAnimating
+            }"
+          >
+            <ProjectCard 
+              :project="getActiveProject()" 
+              :isActive="true"
+              :currentImageIndex="getCurrentImageIndex()"
+              :showNavigation="true"
+              @next-image="nextImage()"
+              @prev-image="prevImage()"
+            />
+          </div>
         </div>
         
         <!-- Next project (right) -->
-        <div 
-          class="project-item flex-shrink-0 w-1/4 opacity-70 cursor-pointer duration-500 ease-in-out transition-all transform-style-3d"
-          :class="{
-            'rotate-item-to-left': rotationDirection === 'prev' && isAnimating,
-            'rotate-item-to-center': rotationDirection === 'next' && isAnimating
-          }"
-          @click="rotateToProject('next')"
-        >
-          <ProjectCard 
-            :project="getNextProject()" 
-            :isActive="false"
-            :currentImageIndex="0"
-            :showNavigation="false"
-          />
+        <div class="project-item-container relative flex-shrink-0 w-1/4 sm:w-1/3">
+          <div 
+            class="project-item w-full opacity-70 duration-500 ease-in-out transition-all transform-style-3d"
+            :class="{
+              'rotate-item-to-left': rotationDirection === 'prev' && isAnimating,
+              'rotate-item-to-center': rotationDirection === 'next' && isAnimating
+            }"
+          >
+            <ProjectCard 
+              :project="getNextProject()" 
+              :isActive="false"
+              :currentImageIndex="0"
+              :showNavigation="false"
+            />
+          </div>
+          <!-- Clickable overlay for Firefox compatibility -->
+          <button 
+            class="absolute inset-0 z-30 opacity-0 cursor-pointer hover:cursor-pointer focus:outline-none"
+            @click="rotateToProject('next')"
+            aria-label="Next project"
+          ></button>
         </div>
       </div>
     </div>
@@ -176,6 +192,8 @@ const prevImage = () => {
 
 .transform-style-3d {
   transform-style: preserve-3d;
+  -moz-transform-style: preserve-3d; /* Firefox specific */
+  will-change: transform; /* Optimize for hardware acceleration */
 }
 
 .carousel-track {
@@ -186,19 +204,28 @@ const prevImage = () => {
 .project-item {
   border-radius: 0.5rem;
   backface-visibility: hidden;
+  -moz-backface-visibility: hidden; /* Firefox specific */
+  position: relative;
+  will-change: transform; /* Optimize for hardware acceleration */
 }
 
 /* Active project styling */
-.project-item.active {
+.project-item.active-item {
   transform: scale(0.95) translateZ(50px);
   z-index: 10;
+  filter: grayscale(0%);
 }
 
 /* Inactive projects styling */
-.project-item:not(.active) {
+.project-item:not(.active-item) {
   filter: grayscale(40%);
-  cursor: pointer;
   transform: translateZ(-50px);
+}
+
+.project-item-container {
+  cursor: pointer;
+  transform-style: preserve-3d;
+  -moz-transform-style: preserve-3d; /* Firefox specific */
 }
 
 /* Rotation animations */
@@ -236,8 +263,14 @@ const prevImage = () => {
     gap: 2rem;
   }
   
+  /* Make all project containers the same width on mobile */
+  .project-item-container {
+    width: 100% !important;
+  }
+  
   .project-item {
     width: 90% !important;
+    margin: 0 auto;
   }
   
   /* Disable 3D effects on mobile */
@@ -255,6 +288,12 @@ const prevImage = () => {
   .rotate-item-to-left,
   .rotate-item-to-right {
     transform: none;
+  }
+  
+  /* Reset opacity and filter for all items on mobile */
+  .project-item:not(.active-item) {
+    opacity: 1;
+    filter: grayscale(0%);
   }
 }
 </style>
