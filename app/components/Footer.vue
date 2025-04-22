@@ -1,10 +1,8 @@
 <template>
-  <footer class="border-t bg-background py-6">
-    <div class="container flex flex-col items-center">
-      <p class="text-sm text-muted-foreground">
-        Noah Stewart-Worobec&copy; {{ currentYear }} Portfolio - Built with Nuxt.js
-      </p>
-    </div>
+  <footer class="border-t bg-background py-6 w-full text-center">
+    <p class="text-sm text-muted-foreground mx-auto">
+      Noah Stewart-Worobec&copy; {{ currentYear }} Portfolio - Built with Nuxt.js
+    </p>
   </footer>
 </template>
 
