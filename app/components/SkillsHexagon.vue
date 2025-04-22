@@ -13,10 +13,19 @@
             '--skill-color': getColorForPercentage(percentage)
           }"
         >
-          <div class="hexagon-fill">
-            <div class="hexagon-content">
+          <div class="hexagon-fill"></div>
+          <div class="hexagon-content">
+            <div class="skill-name">{{ skillName }}</div>
+            <div class="skill-percentage">{{ percentage }}%</div>
+          </div>
+          <!-- Skill bar overlay appears on hover -->
+          <div class="skill-bar-overlay">
+            <div class="skill-bar-content">
               <div class="skill-name">{{ skillName }}</div>
               <div class="skill-percentage">{{ percentage }}%</div>
+              <div class="skill-bar">
+                <div class="skill-bar-fill" :style="{ width: `${percentage}%` }"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -96,6 +105,18 @@ const getColorForPercentage = (percentage: number): string => {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), 0 0 15px var(--skill-color);
 }
 
+.hexagon:hover .hexagon-fill,
+.hexagon:hover .hexagon-content {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.hexagon:hover .skill-bar-overlay {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
 .hexagon-fill {
   position: absolute;
   bottom: 0;
@@ -103,7 +124,7 @@ const getColorForPercentage = (percentage: number): string => {
   width: 100%;
   height: var(--skill-percentage);
   background: var(--skill-color);
-  transition: height 1s ease-out;
+  transition: all 0.3s ease-out;
   opacity: 0.6;
   z-index: 1;
 }
@@ -122,6 +143,53 @@ const getColorForPercentage = (percentage: number): string => {
   align-items: center;
   justify-content: flex-end;
   height: 100%;
+  transition: all 0.3s ease;
+}
+
+/* Skill bar overlay */
+.skill-bar-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 5, 30, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  transform: translateY(10px);
+  z-index: 10;
+}
+
+.skill-bar-content {
+  text-align: center;
+  color: white;
+  padding: 1rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.skill-bar {
+  width: 85%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 0.6rem;
+}
+
+.skill-bar-fill {
+  height: 100%;
+  background: var(--skill-color);
+  border-radius: 3px;
+  box-shadow: 0 0 8px var(--skill-color);
+  transition: width 0.6s ease-in-out;
 }
 
 .skill-name {
@@ -153,6 +221,11 @@ const getColorForPercentage = (percentage: number): string => {
   .skill-percentage {
     font-size: 0.8rem;
   }
+  
+  .skill-bar {
+    height: 5px;
+    margin-top: 0.4rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -165,8 +238,14 @@ const getColorForPercentage = (percentage: number): string => {
     gap: 1rem;
   }
   
-  .hexagon-content {
+  .hexagon-content, 
+  .skill-bar-content {
     padding: 0.75rem;
+  }
+  
+  .skill-bar {
+    height: 4px;
+    margin-top: 0.3rem;
   }
 }
 </style>
